@@ -195,7 +195,8 @@ def load_model_and_classes():
     model = CropStressResNet50(num_classes)
 
     # Load the checkpoint
-    state_dict = torch.load(MODEL_PATH, map_location=device, weights_only=True)
+    state_dict = torch.load(MODEL_PATH, map_location=device)
+
 
     # The saved checkpoint may have raw ResNet keys (e.g. "conv1.weight")
     # but CropStressResNet50 wraps ResNet inside self.model, expecting
@@ -252,12 +253,13 @@ _cors_env = os.environ.get("CORS_ORIGINS", "")
 _extra_origins = [o.strip() for o in _cors_env.split(",") if o.strip()] if _cors_env else []
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:3000",
-        *_extra_origins,
-    ],
+    app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # allow all for now
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
