@@ -411,6 +411,9 @@ async def predict(
 
     return response
 
+@app.get("/")
+async def root():
+    return {"message": "Crop Stress Detection API is running 🚀"}
 
 # ─── Run ────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
