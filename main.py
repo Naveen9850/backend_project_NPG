@@ -253,9 +253,7 @@ _cors_env = os.environ.get("CORS_ORIGINS", "")
 _extra_origins = [o.strip() for o in _cors_env.split(",") if o.strip()] if _cors_env else []
 app.add_middleware(
     CORSMiddleware,
-    app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # allow all for now
+    allow_origins=["*"],  # allow everything
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
