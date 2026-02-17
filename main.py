@@ -252,15 +252,17 @@ app = FastAPI(
 _extra_origins = [o.strip() for o in _cors_env.split(",") if o.strip()] if _cors_env else []
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # allow everything
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-),
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        *_extra_origins,
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 
 # ─── Endpoints ──────────────────────────────────────────────────────────────────
