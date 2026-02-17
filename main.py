@@ -249,7 +249,12 @@ app = FastAPI(
 )
 
 # CORS — allow frontend (dev + production)
-_extra_origins = [o.strip() for o in _cors_env.split(",") if o.strip()] if _cors_env else []
+# CORS configuration
+_cors_env = os.environ.get("CORS_ORIGINS", "")
+_extra_origins = [
+    o.strip() for o in _cors_env.split(",") if o.strip()
+] if _cors_env else []
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
