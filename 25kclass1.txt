@@ -1,0 +1,144 @@
+pring is a java framework used to build 
+enterprise applications 
+java = raw materials 
+spring = readymade building structure 
+
+instead of writing everything manually 
+spring gives you tools to build applications faster and cleaner
+
+Spring boot :
+spring boot is built on top of spring 
+without springboot :
+1. too much xml files 
+2. manual configuration 
+3. complex setup 
+with spring boot :
+1. Auto configured 
+2. Embedded server 
+3. minimal setup 
+4. production ready apps quikly
+
+Dependency injection 
+
+Car car = new Car()
+in spring 
+spring creates objects for u 
+
+spring injects requires objects instead of you creating them 
+
+normally 
+you control object creation 
+
+in spring :
+spring controls object creation 
+that container is called IoC container
+manages 
+1. Object creation 
+Object life cycle 
+Dependency injection 
+
+Bean 
+1. a bean is an object managed by spring 
+
+if spring creates it -->  its a bean 
+@component 
+public class UserService{
+}
+Now user service becomes a bean 
+
+1. Application context 
+1. create beans 
+2. injecting dependencies 
+3. manages everything 
+brain of sspring 
+
+@ compenent :
+used to tell spring :
+hey , manage this class as a bean 
+@Service 
+@repository
+@Controller
+All are special types of @ component 
+
+@Autowierd 
+used for the dependency injection 
+
+@Autowierd
+private UserService UserService;
+Spring automatically injects the user service 
+
+@Configuration 
+used  to define configuration class 
+@Configuration
+public class AutoConfig{}
+@Bean 
+Used inside a @Configuration cclass to manually create the beans 
+
+Spring boot terminologies 
+1. Starter Dependencies 
+
+Examplles 
+Spring -boot-starter-web
+spring-boot-starter-data-jpa
+They bring required libraries automatically 
+No manual dependency hunt
+
+Embedded server:
+Spring boot has built in 
+1. Apache tomcat 
+so you dont install server externally 
+just run :
+mvn spring-boot:run
+server starts 
+
+application.properties/applications.yml
+used to configure L
+port 
+database
+Logging 
+etc 
+server.port = 8081
+
+@SpringBootApplication 
+it combines 
+@configuration 
+@Enable AutoConfiguration
+@ComponentScan
+this  is the main annotation
+
+@SpringbootApplication
+public class MyApp{
+public static void main(String[] args){
+SpringApplication.run(MyApp.classs,args);
+}
+}
+5. Auto configuration 
+Spring boot Automatically Configures 
+1. Database
+server
+Dispatcher servelet 
+many other things 
+
+based on dependencies added 
+
+web layer terminologies 
+1.@Rest Controller 
+used to create the restAPIS
+Example 
+@Rest Controller
+public class UserController{
+}
+@RequestMApping
+Used to map URLs
+Other variations 
+1. @GetMapping
+2.@PostMapping
+3.@PutMapping
+4.@DeleteMapping
+@RequestBody
+Used to accept the json format
+
+@Path variable 
+used to get value from URL
+Example:
+@GetMapping("/user/{id}")

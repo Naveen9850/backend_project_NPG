@@ -318,20 +318,56 @@ async def predict(
     # Pre-process
     input_tensor = transform(pil_image).unsqueeze(0).to(device)
 
-    # Inference
+    # ── Map user-selected crop name → model class name ──────────────────────
+    CROP_TO_CLASS = {
+        "cotton":     "Cotton_Disease",
+        "soybean":    "Sorghum_Disease",   # no dedicated class; closest proxy
+        "sorghum":    "Sorghum_Disease",
+        "pigeon pea": "Sorghum_Disease",   # no dedicated class; closest proxy
+        "groundnut":  "Groundnut_Disease",
+        "sunflower":  "Sorghum_Disease",   # no dedicated class; closest proxy
+        "maize":      "Maize_Disease",
+        "chili":      "Chilli_Disease",
+        "chilli":     "Chilli_Disease",
+    }
+    crop_key = crop_type.strip().lower()
+    is_known_crop = crop_key in CROP_TO_CLASS
+
+    # ── Inference ───────────────────────────────────────────────────────────
     with torch.no_grad():
         outputs = model(input_tensor)
         probabilities = F.softmax(outputs, dim=1)
-        confidence, predicted_idx = torch.max(probabilities, 1)
+
+        if is_known_crop:
+            # Constrain prediction to the user's crop disease class,
+            # Healthy, and Heat_Stress — ignore other crop disease classes.
+            expected_disease_class = CROP_TO_CLASS[crop_key]
+            allowed_classes = {expected_disease_class, "Healthy", "Heat_Stress"}
+            allowed_indices = [
+                i for i, name in enumerate(class_names) if name in allowed_classes
+            ]
+
+            # Mask: set disallowed class logits to -inf so they can't win
+            masked_probs = probabilities.clone()
+            mask = torch.ones_like(masked_probs, dtype=torch.bool)
+            for idx in allowed_indices:
+                mask[0, idx] = False
+            masked_probs[mask] = 0.0
+
+            # Re-normalise over the allowed classes only
+            prob_sum = masked_probs.sum(dim=1, keepdim=True)
+            if prob_sum.item() > 0:
+                masked_probs = masked_probs / prob_sum
+
+            confidence, predicted_idx = torch.max(masked_probs, 1)
+        else:
+            # No crop selected or "Other Crops" — use full distribution
+            confidence, predicted_idx = torch.max(probabilities, 1)
 
     predicted_class = class_names[predicted_idx.item()]
     confidence_score = round(confidence.item(), 4)
 
     processing_time_ms = round((time.time() - start_time) * 1000, 1)
-
-    # Determine if the user's crop matches one of the trained crops
-    TRAINED_CROPS = {"cotton", "soybean", "sorghum", "pigeon pea", "groundnut", "sunflower", "maize", "chili", "chilli"}
-    is_known_crop = crop_type.strip().lower() in TRAINED_CROPS
 
     # Build structured response
     response = PredictionResponse(
